@@ -3,6 +3,7 @@ package com.xdq.mianjingtong.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xdq.mianjingtong.model.dto.user.UserQueryRequest;
+import com.xdq.mianjingtong.model.entity.User;
 import com.xdq.mianjingtong.model.vo.LoginUserVO;
 import com.xdq.mianjingtong.model.vo.UserVO;
 import java.util.List;

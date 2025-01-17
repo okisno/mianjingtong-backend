@@ -8,6 +8,7 @@ import com.xdq.mianjingtong.constant.FileConstant;
 import com.xdq.mianjingtong.exception.BusinessException;
 import com.xdq.mianjingtong.manager.CosManager;
 import com.xdq.mianjingtong.model.dto.file.UploadFileRequest;
+import com.xdq.mianjingtong.model.entity.User;
 import com.xdq.mianjingtong.model.enums.FileUploadBizEnum;
 import com.xdq.mianjingtong.service.UserService;
 import java.io.File;

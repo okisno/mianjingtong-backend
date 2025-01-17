@@ -9,7 +9,7 @@ import java.util.List;
  * 编辑${dataName}请求
  *
  *
- * @from <a href="https://www.code-nav.cn">编程导航学习圈</a>
+ *
  */
 @Data
 public class ${upperDataKey}EditRequest implements Serializable {

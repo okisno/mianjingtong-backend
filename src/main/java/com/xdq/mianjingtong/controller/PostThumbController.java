@@ -5,6 +5,7 @@ import com.xdq.mianjingtong.common.ErrorCode;
 import com.xdq.mianjingtong.common.ResultUtils;
 import com.xdq.mianjingtong.exception.BusinessException;
 import com.xdq.mianjingtong.model.dto.postthumb.PostThumbAddRequest;
+import com.xdq.mianjingtong.model.entity.User;
 import com.xdq.mianjingtong.service.PostThumbService;
 import com.xdq.mianjingtong.service.UserService;
 import javax.annotation.Resource;

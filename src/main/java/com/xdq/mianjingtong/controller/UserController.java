@@ -16,6 +16,7 @@ import com.xdq.mianjingtong.model.dto.user.UserQueryRequest;
 import com.xdq.mianjingtong.model.dto.user.UserRegisterRequest;
 import com.xdq.mianjingtong.model.dto.user.UserUpdateMyRequest;
 import com.xdq.mianjingtong.model.dto.user.UserUpdateRequest;
+import com.xdq.mianjingtong.model.entity.User;
 import com.xdq.mianjingtong.model.vo.LoginUserVO;
 import com.xdq.mianjingtong.model.vo.UserVO;
 import com.xdq.mianjingtong.service.UserService;

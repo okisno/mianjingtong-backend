@@ -10,6 +10,7 @@ import com.xdq.mianjingtong.exception.BusinessException;
 import com.xdq.mianjingtong.mapper.PostFavourMapper;
 import com.xdq.mianjingtong.model.entity.Post;
 import com.xdq.mianjingtong.model.entity.PostFavour;
+import com.xdq.mianjingtong.model.entity.User;
 import com.xdq.mianjingtong.service.PostFavourService;
 import com.xdq.mianjingtong.service.PostService;
 import javax.annotation.Resource;

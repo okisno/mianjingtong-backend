@@ -7,6 +7,7 @@ import com.xdq.mianjingtong.exception.BusinessException;
 import com.xdq.mianjingtong.mapper.PostThumbMapper;
 import com.xdq.mianjingtong.model.entity.Post;
 import com.xdq.mianjingtong.model.entity.PostThumb;
+import com.xdq.mianjingtong.model.entity.User;
 import com.xdq.mianjingtong.service.PostService;
 import com.xdq.mianjingtong.service.PostThumbService;
 import javax.annotation.Resource;

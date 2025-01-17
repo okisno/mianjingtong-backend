@@ -2,6 +2,7 @@ package com.xdq.mianjingtong.service;
 
 import com.xdq.mianjingtong.model.entity.PostThumb;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.xdq.mianjingtong.model.entity.User;
 
 /**
  * 帖子点赞服务

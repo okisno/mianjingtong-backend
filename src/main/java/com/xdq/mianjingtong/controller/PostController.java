@@ -15,6 +15,7 @@ import com.xdq.mianjingtong.model.dto.post.PostEditRequest;
 import com.xdq.mianjingtong.model.dto.post.PostQueryRequest;
 import com.xdq.mianjingtong.model.dto.post.PostUpdateRequest;
 import com.xdq.mianjingtong.model.entity.Post;
+import com.xdq.mianjingtong.model.entity.User;
 import com.xdq.mianjingtong.model.vo.PostVO;
 import com.xdq.mianjingtong.service.PostService;
 import com.xdq.mianjingtong.service.UserService;

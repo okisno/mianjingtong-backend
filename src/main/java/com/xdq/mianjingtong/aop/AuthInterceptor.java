@@ -3,6 +3,7 @@ package com.xdq.mianjingtong.aop;
 import com.xdq.mianjingtong.annotation.AuthCheck;
 import com.xdq.mianjingtong.common.ErrorCode;
 import com.xdq.mianjingtong.exception.BusinessException;
+import com.xdq.mianjingtong.model.entity.User;
 import com.xdq.mianjingtong.model.enums.UserRoleEnum;
 import com.xdq.mianjingtong.service.UserService;
 import org.aspectj.lang.ProceedingJoinPoint;
