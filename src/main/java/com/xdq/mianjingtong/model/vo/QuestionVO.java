@@ -39,6 +39,11 @@ public class QuestionVO implements Serializable {
     private Long userId;
 
     /**
+     * 推荐答案
+     */
+    private String answer;
+
+    /**
      * 创建时间
      */
     private Date createTime;
@@ -52,6 +57,7 @@ public class QuestionVO implements Serializable {
      * 标签列表
      */
     private List<String> tagList;
+
 
     /**
      * 创建用户信息

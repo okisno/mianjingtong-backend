@@ -3,9 +3,14 @@ package com.xdq.mianjingtong.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.xdq.mianjingtong.annotation.AuthCheck;
+import com.xdq.mianjingtong.common.BaseResponse;
+import com.xdq.mianjingtong.constant.UserConstant;
 import com.xdq.mianjingtong.model.dto.question.QuestionQueryRequest;
 import com.xdq.mianjingtong.model.entity.Question;
 import com.xdq.mianjingtong.model.vo.QuestionVO;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -50,4 +55,13 @@ public interface QuestionService extends IService<Question> {
      * @return
      */
     Page<QuestionVO> getQuestionVOPage(Page<Question> questionPage, HttpServletRequest request);
+
+
+    /**
+     * 分页获取题目列表（仅管理员可用）
+     *
+     * @param questionQueryRequest
+     * @return
+     */
+    Page<Question> listQuestionByPage(@RequestBody QuestionQueryRequest questionQueryRequest);
 }

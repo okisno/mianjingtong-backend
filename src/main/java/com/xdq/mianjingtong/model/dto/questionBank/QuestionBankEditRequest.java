@@ -25,14 +25,15 @@ public class QuestionBankEditRequest implements Serializable {
     private String title;
 
     /**
-     * 内容
+     * 描述
      */
-    private String content;
+    private String description;
 
     /**
-     * 标签列表
+     * 图片
      */
-    private List<String> tags;
+    private String picture;
+
 
     private static final long serialVersionUID = 1L;
 }
