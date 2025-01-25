@@ -257,13 +257,18 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
                     .eq(QuestionBankQuestion::getQuestionBankId, questionBankId);
             List<QuestionBankQuestion> questionList = questionBankQuestionService.list(lambdaQueryWrapper);
 
-            if (CollUtil.isNotEmpty(questionList)){
-                //取出题目id集合
-                Set<Long> questionIdList = questionList.stream()
+            if (CollUtil.isNotEmpty(questionList)) {
+                // 取出题目 id 集合
+                Set<Long> questionIdSet = questionList.stream()
                         .map(QuestionBankQuestion::getQuestionId)
                         .collect(Collectors.toSet());
-                queryWrapper.in("id", questionIdList);
+                // 复用原有题目表的查询条件
+                queryWrapper.in("id", questionIdSet);
+            } else {
+                // 题库为空，则返回空列表
+                return new Page<>(current, size, 0);
             }
+
         }
 
         // 查询数据库

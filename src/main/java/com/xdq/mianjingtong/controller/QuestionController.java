@@ -180,6 +180,12 @@ public class QuestionController {
     @PostMapping("/list/page/vo")
     public BaseResponse<Page<QuestionVO>> listQuestionVOByPage(@RequestBody QuestionQueryRequest questionQueryRequest,
                                                                HttpServletRequest request) {
+        List<String> tags = questionQueryRequest.getTagList();
+        if (tags != null){
+            questionQueryRequest.setTags(tags);
+        }
+
+
         long current = questionQueryRequest.getCurrent();
         long size = questionQueryRequest.getPageSize();
         // 限制爬虫

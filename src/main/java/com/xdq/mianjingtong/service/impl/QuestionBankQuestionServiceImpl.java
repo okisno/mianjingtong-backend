@@ -23,6 +23,7 @@ import com.xdq.mianjingtong.service.UserService;
 import com.xdq.mianjingtong.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -45,10 +46,10 @@ public class QuestionBankQuestionServiceImpl extends ServiceImpl<QuestionBankQue
     @Resource
     private UserService userService;
 
-    @Resource
+    @Autowired
     private QuestionService questionService;
 
-    @Resource
+    @Autowired
     private QuestionBankService questionBankService;
 
     /**

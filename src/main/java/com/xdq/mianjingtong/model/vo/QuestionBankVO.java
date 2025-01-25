@@ -56,7 +56,7 @@ public class QuestionBankVO implements Serializable {
     /**
      * 封装返回题目列表
      */
-    private Page<Question> questionPage;
+    private Page<QuestionVO> questionPage;
 
     /**
      * 创建用户信息

@@ -2,6 +2,10 @@
 #  
 #  
 spring:
+  main:
+    # 该属性设为true，就是允许循环引用存在，默认值为false
+    allow-circular-references: true
+
   application:
     name: mianjingtong
   # 默认 dev 环境
