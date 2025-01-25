@@ -1,9 +1,8 @@
 package com.xdq.mianjingtong.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
+import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
 
@@ -13,7 +12,7 @@ import lombok.Data;
  */
 @TableName(value ="question_bank")
 @Data
-public class QuestionBank {
+public class QuestionBank implements Serializable {
     /**
      * id
      */
@@ -60,4 +59,7 @@ public class QuestionBank {
      */
     @TableLogic
     private Integer isDelete;
+
+    @TableField(exist = false)
+    private static final long serialVersionUID = 1L;
 }

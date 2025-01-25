@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xdq.mianjingtong.common.ErrorCode;
 import com.xdq.mianjingtong.constant.CommonConstant;
+import com.xdq.mianjingtong.constant.RedisConstant;
 import com.xdq.mianjingtong.exception.BusinessException;
 import com.xdq.mianjingtong.mapper.UserMapper;
 import com.xdq.mianjingtong.model.dto.user.UserQueryRequest;
@@ -16,14 +17,21 @@ import com.xdq.mianjingtong.model.vo.LoginUserVO;
 import com.xdq.mianjingtong.model.vo.UserVO;
 import com.xdq.mianjingtong.service.UserService;
 import com.xdq.mianjingtong.utils.SqlUtils;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.time.LocalDate;
+import java.time.Year;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RBitSet;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -41,6 +49,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 盐值，混淆密码
      */
     public static final String SALT = "yupi";
+
+    @Autowired
+    private RedissonClient redissonClient;
+
+    public UserServiceImpl(RedissonClient redissonClient) {
+        this.redissonClient = redissonClient;
+    }
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -270,5 +285,106 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);
         return queryWrapper;
+    }
+
+    /**
+     * 添加用户签到记录
+     * @param userId 用户id
+     * @return 当前用户是否已经签到成功
+     * 年份此处不作为变量提供，因为当前时间可以直接获取
+     */
+    @Override
+    public boolean addUserSignIn(long userId) {
+        LocalDate date = LocalDate.now();
+        String key = RedisConstant.getUserSignInRedisKey(date.getYear(), userId);
+
+        // 获取到 Redis 的 BitMap
+        RBitSet signInBitSet = redissonClient.getBitSet(key);
+
+        // 偏移量：获取当天是一年中的第几天 从 1 开始计算
+        int offset = date.getDayOfYear();
+
+        // 查询当天是否签到
+        if (!signInBitSet.get(offset)) {
+            // 表示当天未签到，执行签到行为
+            signInBitSet.set(offset, true);
+        }
+
+        // 执行至此，当天用户一定已经签到，返回true即可，返回值代表当天是否签到
+        return true;
+    }
+
+    /**
+     * 获取用户某年份签到记录
+     * @param userId 用户id
+     * @param year 年份
+     * @return 签到记录映射
+     */
+    @Override
+    public List<Integer> getUserSignInStatus(long userId, Integer year) {
+        if (year == null) {
+            year = LocalDate.now().getYear();
+        }
+
+        // 获取 Redis 的 BitMap
+        RBitSet signInBitSet = redissonClient.getBitSet(RedisConstant.getUserSignInRedisKey(year, userId));
+        /*
+        优化点1：
+            先获取到所有值，并且做缓存，而不是在for循环里根据日期获取值，可以避免多次发送请求，提升效率
+            jdk自带的BitSet，将数据缓存在Java内存中
+            ！！！加载 BitSet 到内存中，避免后续读取时发送多次请求
+         */
+        BitSet bitSet = signInBitSet.asBitSet();
+
+        // 优化点2：我们返回了一年中每天的签到情况，接口的传输数据很多，但是事实上我们只需要返回签到了的日期，甚至是签到的时一年中第几天，然后交给前端处理即可
+        List<Integer> dayList = new ArrayList<>();
+
+        //方法三,BitSet特性，查找为1的位置即可，大大减少了查找的次数，循环效率要比for循环高的多，基于二进制位运算
+        // 从索引0开始查找下一个被设置为1的值
+        int index = bitSet.nextSetBit(0);
+        while (index >= 0){
+            dayList.add(index);
+            // 继续查找下一个被设置为1的位
+            index = bitSet.nextSetBit(index + 1);
+        }
+
+
+        // 构造返回结果
+        // LinkedHashMap 不仅可以作为映射，还可以保证数据的有序性，将二维数组转化为map了 ["01-01", true]
+        //Map<LocalDate, Boolean> result = new LinkedHashMap<>();
+
+
+        // 获取当前年份有多少天
+        int days = Year.of(year).length();
+
+        /*// 遍历天数，获取每天的签到状态
+        for (int dayOfYear = 1; dayOfYear <= days; dayOfYear++) {
+            *//*
+            //方法一：
+            // key 当前日期
+            // 同样是jdk时间包下的方法
+            LocalDate currentDate = LocalDate.ofYearDay(year, dayOfYear);
+
+            // 获取 value 当天是否刷题
+            // bitSet 实际上是 Redisson 客户端和 Redis 交互的对象，每次调用 get方法都会触发一次 Redis 请求来获取值，没有在本地做缓存
+            //boolean isWork = signInBitSet.get(dayOfYear);
+
+            // 改用 Java 的 BitSet ，提前将数据缓存到 Java 内存中，不再需要频繁发送 Redis 请求
+            boolean isWork = bitSet.get(dayOfYear);
+
+            result.put(currentDate, isWork);*//*
+
+            *//*//方法二：
+            boolean isWork = bitSet.get(dayOfYear);
+
+            if (isWork) {
+                dayList.add(dayOfYear);
+            }*//*
+
+
+        }*/
+
+        //return result;
+        return dayList;
     }
 }

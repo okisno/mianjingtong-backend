@@ -6,8 +6,13 @@ import com.xdq.mianjingtong.model.dto.user.UserQueryRequest;
 import com.xdq.mianjingtong.model.entity.User;
 import com.xdq.mianjingtong.model.vo.LoginUserVO;
 import com.xdq.mianjingtong.model.vo.UserVO;
+
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+
+import io.swagger.models.auth.In;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 
 /**
@@ -117,5 +122,22 @@ public interface UserService extends IService<User> {
      * @return
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
+
+    /**
+     * 添加用户签到记录
+     * @param userId 用户id
+     * @return 当前用户是否已经签到成功
+     * 年份此处不作为变量提供，因为当前时间可以直接获取
+     */
+    boolean addUserSignIn(long userId);
+
+    /**
+     * 获取用户某年份签到记录
+     * @param userId 用户id
+     * @param year 年份
+     * @return 签到记录映射
+     */
+    //Map<LocalDate, Boolean> getUserSignInStatus(long userId, Integer year);
+    List<Integer> getUserSignInStatus(long userId, Integer year);
 
 }

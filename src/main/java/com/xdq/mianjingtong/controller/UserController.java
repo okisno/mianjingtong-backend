@@ -21,11 +21,14 @@ import com.xdq.mianjingtong.model.vo.LoginUserVO;
 import com.xdq.mianjingtong.model.vo.UserVO;
 import com.xdq.mianjingtong.service.UserService;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
@@ -317,4 +320,30 @@ public class UserController {
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }
+
+
+    /**
+     * 添加用户签到记录
+     * @param request
+     * @return
+     */
+    @PostMapping("/add/sign_in")
+    public BaseResponse<Boolean> addUserSignIn(HttpServletRequest request) {
+        // 首先用户需要登录才能签到，获取用户id
+        User loginUser = userService.getLoginUser(request);
+        boolean result = userService.addUserSignIn(loginUser.getId());
+
+        return ResultUtils.success(result);
+    }
+
+
+    @GetMapping("/get/sign_in")
+    public BaseResponse<List<Integer>> getUserSignInRecord(Integer year, HttpServletRequest request) {
+        // 首先用户需要登录才能签到，获取用户id
+        User user = userService.getLoginUser(request);
+        List<Integer> userSignInStatus = userService.getUserSignInStatus(user.getId(), year);
+        return ResultUtils.success(userSignInStatus);
+
+    }
+
 }
