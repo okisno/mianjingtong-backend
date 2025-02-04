@@ -9,10 +9,12 @@ import com.xdq.mianjingtong.constant.UserConstant;
 import com.xdq.mianjingtong.model.dto.question.QuestionQueryRequest;
 import com.xdq.mianjingtong.model.entity.Question;
 import com.xdq.mianjingtong.model.vo.QuestionVO;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 题目服务
@@ -73,4 +75,6 @@ public interface QuestionService extends IService<Question> {
      */
     Page<Question> searchFromEs(QuestionQueryRequest questionQueryRequest);
 
+    @Transactional(rollbackFor = Exception.class)
+    void batchDeleteQuestions(List<Long> questionIdList);
 }

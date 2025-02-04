@@ -11,14 +11,13 @@ import com.xdq.mianjingtong.common.ResultUtils;
 import com.xdq.mianjingtong.constant.UserConstant;
 import com.xdq.mianjingtong.exception.BusinessException;
 import com.xdq.mianjingtong.exception.ThrowUtils;
-import com.xdq.mianjingtong.model.dto.questionBankQuestion.QuestionBankQuestionAddRequest;
-import com.xdq.mianjingtong.model.dto.questionBankQuestion.QuestionBankQuestionQueryRequest;
-import com.xdq.mianjingtong.model.dto.questionBankQuestion.QuestionBankQuestionRemoveRequest;
-import com.xdq.mianjingtong.model.dto.questionBankQuestion.QuestionBankQuestionUpdateRequest;
+import com.xdq.mianjingtong.model.dto.question.QuestionBatchDeleteRequest;
+import com.xdq.mianjingtong.model.dto.questionBankQuestion.*;
 import com.xdq.mianjingtong.model.entity.QuestionBankQuestion;
 import com.xdq.mianjingtong.model.entity.User;
 import com.xdq.mianjingtong.model.vo.QuestionBankQuestionVO;
 import com.xdq.mianjingtong.service.QuestionBankQuestionService;
+import com.xdq.mianjingtong.service.QuestionService;
 import com.xdq.mianjingtong.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 题库题目关联接口
@@ -43,6 +43,9 @@ public class QuestionBankQuestionController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private QuestionService questionService;
 
     // region 增删改查
 
@@ -228,6 +231,48 @@ public class QuestionBankQuestionController {
                 .eq(QuestionBankQuestion::getQuestionBankId, questionBankId);
         boolean result = questionBankQuestionService.remove(lambdaQueryWrapper);
         return ResultUtils.success(result);
+    }
+
+
+    /**
+     * 批量添加题目到题库（仅管理员可用）
+     *
+     * @param questionBankQuestionBatchAddRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/add/batch")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> batchAddQuestionsToBank(
+            @RequestBody QuestionBankQuestionBatchAddRequest questionBankQuestionBatchAddRequest,
+            HttpServletRequest request
+    ) {
+        ThrowUtils.throwIf(questionBankQuestionBatchAddRequest == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        Long questionBankId = questionBankQuestionBatchAddRequest.getQuestionBankId();
+        List<Long> questionIdList = questionBankQuestionBatchAddRequest.getQuestionIdList();
+        questionBankQuestionService.batchAddQuestionsToBank(questionIdList, questionBankId, loginUser);
+        return ResultUtils.success(true);
+    }
+
+    /**
+     * 批量从题库移除题目（仅管理员可用）
+     *
+     * @param questionBankQuestionBatchRemoveRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/remove/batch")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> batchRemoveQuestionsFromBank(
+            @RequestBody QuestionBankQuestionBatchRemoveRequest questionBankQuestionBatchRemoveRequest,
+            HttpServletRequest request
+    ) {
+        ThrowUtils.throwIf(questionBankQuestionBatchRemoveRequest == null, ErrorCode.PARAMS_ERROR);
+        Long questionBankId = questionBankQuestionBatchRemoveRequest.getQuestionBankId();
+        List<Long> questionIdList = questionBankQuestionBatchRemoveRequest.getQuestionIdList();
+        questionBankQuestionService.batchRemoveQuestionsFromBank(questionIdList, questionBankId);
+        return ResultUtils.success(true);
     }
 
 

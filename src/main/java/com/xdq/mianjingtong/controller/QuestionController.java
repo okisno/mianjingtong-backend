@@ -10,10 +10,8 @@ import com.xdq.mianjingtong.common.ResultUtils;
 import com.xdq.mianjingtong.constant.UserConstant;
 import com.xdq.mianjingtong.exception.BusinessException;
 import com.xdq.mianjingtong.exception.ThrowUtils;
-import com.xdq.mianjingtong.model.dto.question.QuestionAddRequest;
-import com.xdq.mianjingtong.model.dto.question.QuestionEditRequest;
-import com.xdq.mianjingtong.model.dto.question.QuestionQueryRequest;
-import com.xdq.mianjingtong.model.dto.question.QuestionUpdateRequest;
+import com.xdq.mianjingtong.model.dto.question.*;
+import com.xdq.mianjingtong.model.dto.questionBankQuestion.QuestionBankQuestionBatchAddRequest;
 import com.xdq.mianjingtong.model.entity.Question;
 import com.xdq.mianjingtong.model.entity.User;
 import com.xdq.mianjingtong.model.vo.QuestionVO;
@@ -266,5 +264,12 @@ public class QuestionController {
         return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
     }
 
+    @PostMapping("/delete/batch")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> batchDeleteQuestions(@RequestBody QuestionBatchDeleteRequest questionBatchDeleteRequest) {
+        ThrowUtils.throwIf(questionBatchDeleteRequest == null, ErrorCode.PARAMS_ERROR);
+        questionService.batchDeleteQuestions(questionBatchDeleteRequest.getQuestionIdList());
+        return ResultUtils.success(true);
+    }
 
 }
