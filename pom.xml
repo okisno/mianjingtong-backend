@@ -111,6 +111,13 @@
             <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
             <version>2021.0.5.0</version>
         </dependency>
+        <!-- nacos -->
+        <dependency>
+            <groupId>com.alibaba.boot</groupId>
+            <artifactId>nacos-config-spring-boot-starter</artifactId>
+            <version>0.2.12</version>
+        </dependency>
+
 
         <!-- https://github.com/alibaba/easyexcel -->
         <dependency>
