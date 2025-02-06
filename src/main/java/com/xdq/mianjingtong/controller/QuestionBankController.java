@@ -1,6 +1,10 @@
 package com.xdq.mianjingtong.controller;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
+import com.alibaba.csp.sentinel.slots.block.degrade.DegradeException;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jd.platform.hotkey.client.callback.JdHotKeyStore;
 import com.xdq.mianjingtong.annotation.AuthCheck;
 import com.xdq.mianjingtong.common.BaseResponse;
 import com.xdq.mianjingtong.common.DeleteRequest;
@@ -143,6 +147,20 @@ public class QuestionBankController {
         ThrowUtils.throwIf(questionBankQueryRequest == null, ErrorCode.PARAMS_ERROR);
         Long id = questionBankQueryRequest.getId();
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
+
+        //TODO: hotkey理解
+        //生成 key
+        String key = "bank_detail_" + id;
+        //如果是热 key
+        if (JdHotKeyStore.isHotKey(key)){
+            //从本地缓存中获取缓存值
+            Object cachedQuestionBankVo = JdHotKeyStore.get(key);
+            if (cachedQuestionBankVo != null) {
+                //如果缓存中有值，直接返回缓存的值
+                return ResultUtils.success((QuestionBankVO) cachedQuestionBankVo);
+            }
+        }
+
         // 查询数据库
         QuestionBank questionBank = questionBankService.getById(id);
         ThrowUtils.throwIf(questionBank == null, ErrorCode.NOT_FOUND_ERROR);
@@ -160,6 +178,11 @@ public class QuestionBankController {
             Page<Question> questionPage = questionService.listQuestionByPage(questionQueryRequest);
             questionBankVO.setQuestionPage(questionService.getQuestionVOPage(questionPage, request));
         }
+
+        //TODO: hotkey 理解 设置本地缓存
+        //本地缓存 (如果不是热key，这个方法不会设置缓存)
+        JdHotKeyStore.smartSet(key, questionBankVO);
+
         // 获取封装类
         return ResultUtils.success(questionBankVO);
     }
@@ -189,7 +212,19 @@ public class QuestionBankController {
      * @param request
      * @return
      */
+    /*
+    sentinel 避免系统崩溃和保证服务稳定性，通常采取限流防止过载，除此之外，
+    为了进一步隔离和保护系统，防止某些组件异常时影响系统的稳定性，还会采用 熔断机制 + 降级策略 进行兜底处理
+    三件套： 限流，熔断，降级
+    SentinelResource sentinel网站流量控制和熔断
+        value 资源名称
+        blockHandler 流量访问超过限制后，触发限流，阻塞操作    blockHandler指定处理阻塞操作的方法名
+        fallback 熔断后触发降级，调用哪个方法进行降级操作
+     */
     @PostMapping("/list/page/vo")
+    @SentinelResource(value = "listQuestionBankVOByPage",
+                blockHandler = "handleBlockException",
+                fallback = "handleFallback")
     public BaseResponse<Page<QuestionBankVO>> listQuestionBankVOByPage(@RequestBody QuestionBankQueryRequest questionBankQueryRequest,
                                                                HttpServletRequest request) {
         long current = questionBankQueryRequest.getCurrent();
@@ -202,6 +237,44 @@ public class QuestionBankController {
         // 获取封装类
         return ResultUtils.success(questionBankService.getQuestionBankVOPage(questionBankPage, request));
     }
+
+    /**
+     * 熔断规则：
+     *  熔断条件：如果接口异常率超过10%，或者慢调用（响应时长>3s）的比例大于20%，触发60s熔断
+     *  熔断：60s后进入半开状态，如果还是满足熔断条件，继续熔断，反之恢复正常
+     *  listQuestionBankVOByPage 降级操作：直接返回本地数据或者空数据
+     *
+     *  熔断策略(降级方法)不止针对熔断规则执行，出现了任何业务异常都会调用降级处理器
+     *
+     *  handleFallback针对普通业务异常做处理
+     */
+    public BaseResponse<Page<QuestionBankVO>> handleFallback(@RequestBody QuestionBankQueryRequest questionBankQueryRequest,
+                                                             HttpServletRequest request, Throwable ex) {
+        // 可以返回本地数据或空数据
+        return ResultUtils.success(null);
+    }
+
+    /**
+     * 限流规则：
+     *  限流条件：整个接口每秒钟不超过10次请求
+     *  listQuestionBankVOByPage 流控操作
+     *  阻塞操作：
+     *  限流：提示“系统压力过大，请耐心等待”
+     *  熔断：执行奖及操作
+     *
+     *  sentinel的异常都叫BlockException，熔断触发后，
+     *  handleBlockException会处理熔断之后的降级以及限流
+     */
+    public BaseResponse<Page<QuestionBankVO>> handleBlockException(@RequestBody QuestionBankQueryRequest questionBankQueryRequest,
+                                                                   HttpServletRequest request, BlockException ex) {
+        // 降级操作
+        if (ex instanceof DegradeException) {
+            return handleFallback(questionBankQueryRequest, request, ex);
+        }
+        // 限流操作
+        return ResultUtils.error(ErrorCode.SYSTEM_ERROR, "系统压力过大，请耐心等待");
+    }
+
 
     /**
      * 分页获取当前登录用户创建的题库列表
