@@ -2,12 +2,15 @@ package com.xdq.mianjingtong.service.impl;
 
 import static com.xdq.mianjingtong.constant.UserConstant.USER_LOGIN_STATE;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xdq.mianjingtong.common.ErrorCode;
 import com.xdq.mianjingtong.constant.CommonConstant;
 import com.xdq.mianjingtong.constant.RedisConstant;
+import com.xdq.mianjingtong.constant.UserConstant;
 import com.xdq.mianjingtong.exception.BusinessException;
 import com.xdq.mianjingtong.mapper.UserMapper;
 import com.xdq.mianjingtong.model.dto.user.UserQueryRequest;
@@ -15,6 +18,7 @@ import com.xdq.mianjingtong.model.entity.User;
 import com.xdq.mianjingtong.model.enums.UserRoleEnum;
 import com.xdq.mianjingtong.model.vo.LoginUserVO;
 import com.xdq.mianjingtong.model.vo.UserVO;
+import com.xdq.mianjingtong.satoken.DeviceUtils;
 import com.xdq.mianjingtong.service.UserService;
 import com.xdq.mianjingtong.utils.SqlUtils;
 
@@ -120,7 +124,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
         }
         // 3. 记录用户的登录态
-        request.getSession().setAttribute(USER_LOGIN_STATE, user);
+        //request.getSession().setAttribute(USER_LOGIN_STATE, user);
+
+        // Sa-Token登录，并指定设备，同端登录互斥
+        StpUtil.login(user.getId(), DeviceUtils.getRequestDevice(request));
+        StpUtil.getSession().set(USER_LOGIN_STATE, user);
         return this.getLoginUserVO(user);
     }
 
@@ -164,12 +172,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public User getLoginUser(HttpServletRequest request) {
+        Object loginUserId = StpUtil.getLoginIdDefaultNull();
+        if (loginUserId == null) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+        }
+
+
         // 先判断是否已登录
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        /*Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null || currentUser.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
-        }
+        }*/
+
+        User currentUser = this.getById(loginUserId.toString());
+
         // 从数据库查询（追求性能的话可以注释，直接走缓存）
         long userId = currentUser.getId();
         currentUser = this.getById(userId);
@@ -224,11 +241,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public boolean userLogout(HttpServletRequest request) {
-        if (request.getSession().getAttribute(USER_LOGIN_STATE) == null) {
+        /*if (request.getSession().getAttribute(USER_LOGIN_STATE) == null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "未登录");
         }
         // 移除登录态
-        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        request.getSession().removeAttribute(USER_LOGIN_STATE);*/
+
+        StpUtil.checkLogin();
+        //移除登录态
+        StpUtil.logout();
+
         return true;
     }
 

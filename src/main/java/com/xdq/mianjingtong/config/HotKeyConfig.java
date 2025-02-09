@@ -12,8 +12,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * hotkey 热key发现配置
  *
  */
-@Configuration
-@ConfigurationProperties(prefix = "hotkey")
+//TODO:取消注释开启hotkey
+//@Configuration
+//@ConfigurationProperties(prefix = "hotkey")
 @Data
 public class HotKeyConfig {
 

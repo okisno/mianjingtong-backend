@@ -75,6 +75,7 @@ public class SentinelRulesManager {
     public void listenRules() throws Exception {
         // 获取项目根目录
         String rootPath = System.getProperty("user.dir");
+        System.out.println(rootPath);
         // sentinel 目录路径
         File sentinelDir = new File(rootPath, "sentinel");
         // 目录不存在则创建

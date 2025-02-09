@@ -21,7 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @description NacosListener
  */
 @Slf4j
-@Component
+//TODO:取消注释开启nacos
+//@Component
 public class NacosListener implements InitializingBean {
 
     @NacosInjected

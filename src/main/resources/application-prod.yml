@@ -8,23 +8,23 @@ spring:
   # todo 需替换配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/mianjingtong
-    username: root
-    password: 123456
+    url: jdbc:mysql://62.234.144.106:3306/mianjingtong
+    username: mianjingtong
+    password: zwj..622
   # Redis 配置
   # todo 需替换配置
   redis:
     database: 1
-    host: localhost
+    host: 62.234.144.106
     port: 6379
     timeout: 5000
-    password: 123456
-  # Elasticsearch 配置
-  # todo 需替换配置
-  elasticsearch:
-    uris: http://localhost:9200
-    username: root
-    password: 123456
+    password: zwj..622
+#  # Elasticsearch 配置
+#  # todo 需替换配置
+#  elasticsearch:
+#    uris: http://62.234.144.106:9200
+#    username: root
+#    password: zwj..622
 mybatis-plus:
   configuration:
     # 生产环境关闭日志
@@ -34,4 +34,4 @@ knife4j:
   basic:
     enable: true
     username: root
-    password: 123456
+    password: zwj..622

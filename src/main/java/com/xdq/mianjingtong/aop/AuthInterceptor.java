@@ -21,10 +21,10 @@ import javax.servlet.http.HttpServletRequest;
  * 权限校验 AOP
  *
  
- *  
+ *  使用Sa-Token代替自己写的权限校验
  */
-@Aspect
-@Component
+//@Aspect
+//@Component
 public class AuthInterceptor {
 
     @Resource

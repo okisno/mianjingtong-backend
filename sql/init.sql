@@ -11,7 +11,7 @@ VALUES (1, 'user1', 'b0dd3697a192885d7c055db46155b26a', 'unionId1', 'mpOpenId1',
         'https://www.code-nav.cn/logo.png', '前端爱好者', 'user'),
        (4, 'user4', 'b0dd3697a192885d7c055db46155b26a', 'unionId4', 'mpOpenId4', 'user4',
         'https://www.code-nav.cn/logo.png', '后端开发工程师', 'user'),
-       (5, 'xdq', 'b0dd3697a192885d7c055db46155b26a', NULL, NULL, '程序员鱼皮', 'https://www.code-nav.cn/logo.png',
+       (5, 'yupi', 'b0dd3697a192885d7c055db46155b26a', NULL, NULL, '程序员鱼皮', 'https://www.code-nav.cn/logo.png',
         '系统管理员', 'admin');
 
 -- 题库表初始数据
@@ -112,5 +112,4 @@ VALUES (1, 1, 1),
        (9, 17, 3),
        (10, 12, 1),
        (10, 20, 1);
-
 
