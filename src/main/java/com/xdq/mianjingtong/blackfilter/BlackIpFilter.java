@@ -14,7 +14,7 @@ import java.io.IOException;
  * 使用servlet的filter执行时机早
  */
 //TODO:取消注释开启nacos
-//@WebFilter(urlPatterns = "/*", filterName = "blackIpFilter")
+@WebFilter(urlPatterns = "/*", filterName = "blackIpFilter")
 public class BlackIpFilter implements Filter {
 
     @Override
